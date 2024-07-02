@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "75016048-FA12-4134-8E9A-2B9BDF7B068E",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:",
+      "identifier" : "VACopyWithClient",
+      "name" : "VACopyWithClient"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "VACopyWithTests",
+        "name" : "VACopyWithTests"
+      }
+    }
+  ],
+  "version" : 1
+}
