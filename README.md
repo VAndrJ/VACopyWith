@@ -125,7 +125,7 @@ struct SomeStruct {
 // expands to
 
 struct SomeStruct {
-    let id = UUID()
+    let id = "const uuidstring ;)"
     let constantProperty = false
     var boolValue = true
     var intValue = 1
@@ -150,6 +150,47 @@ extension SomeStruct {
 
 let exampleStruct = SomeStruct()
 let exampleStructWithFalse = exampleStruct.copyWith(boolValue: false)
+```
+
+
+### @MutableCopy
+
+
+Example:
+
+
+```swift
+@MutableCopy
+struct SomeStruct: Equatable {
+    let id = "const uuidstring ;)"
+    var intValue: Int
+    var boolValue: Bool
+}
+
+// expands to
+
+struct SomeStruct: Equatable {
+    let id = "const uuidstring ;)"
+    var intValue: Int
+    var boolValue: Bool
+}
+
+extension SomeStruct {
+    func mutableCopy(configuring: (inout SomeStruct) throws -> Void) rethrows -> SomeStruct {
+        var mutableCopy = self
+        try configuring(&mutableCopy)
+
+        return mutableCopy
+    }
+}
+
+// usage
+
+let exampleStruct = SomeStruct(parameter1: 0, parameter2: false)
+let exampleStructModified = exampleStruct.mutableCopy {
+    $0.intValue = 42
+    $0.boolValue = true
+}
 ```
 
 

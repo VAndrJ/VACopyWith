@@ -38,3 +38,16 @@ let value2 = SomeStruct2()
 assert(value2.copyWith(parameter1: [2, 3, 4]) == SomeStruct2(parameter1: [2, 3, 4]))
 assert(value2.copyWith(parameter2: .value("new string")) == SomeStruct2(parameter2: "new string"))
 assert(value2.copyWith(parameter2: .nil) == SomeStruct2(parameter2: nil))
+
+@MutableCopy
+struct SomeStruct3: Equatable {
+    let id = "const uuidstring ;)"
+    var parameter1: Int
+    var parameter2: Bool
+}
+
+let value3 = SomeStruct3(parameter1: 0, parameter2: false)
+assert(value3.mutableCopy {
+    $0.parameter1 = 42
+    $0.parameter2 = true
+} == SomeStruct3(parameter1: 42, parameter2: true))

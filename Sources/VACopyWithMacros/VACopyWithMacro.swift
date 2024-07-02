@@ -17,11 +17,11 @@ public struct VACopyWithMacro: ExtensionMacro {
         }
         
         let storedProperties = try decl.storedProperties()
-        guard !storedProperties.isEmpty else {
+        let properties = storedProperties.compactMap(\.nameWithType)
+        guard !properties.isEmpty else {
             return []
         }
-        
-        let properties = storedProperties.compactMap(\.nameWithType)
+
         let isContainsOptional = properties.contains { $0.type.isOptional }
         
         return [
@@ -96,7 +96,43 @@ public struct VACopyWithMacro: ExtensionMacro {
     }
 }
 
+public struct VAMutableCopyMacro: ExtensionMacro {
+
+    public static func expansion(
+        of node: AttributeSyntax,
+        attachedTo declaration: some DeclGroupSyntax,
+        providingExtensionsOf type: some TypeSyntaxProtocol,
+        conformingTo protocols: [TypeSyntax],
+        in context: some MacroExpansionContext
+    ) throws -> [ExtensionDeclSyntax] {
+        guard let decl = declaration.as(StructDeclSyntax.self) else {
+            throw VACopyWithMacroError.notStruct
+        }
+
+        let storedProperties = try decl.storedProperties()
+        guard storedProperties.contains(where: { $0.isVar }) else {
+            return []
+        }
+
+        return [
+            ExtensionDeclSyntax(modifiers: decl.modifiers.accessModifier, extendedType: type) {
+                """
+                func mutableCopy(configuring: (inout \(type)) throws -> Void) rethrows -> \(type) {
+                    var mutableCopy = self
+                    try configuring(&mutableCopy)
+
+                    return mutableCopy
+                }
+                """
+            },
+        ]
+    }
+}
+
 @main
 struct VACopyWithPlugin: CompilerPlugin {
-    let providingMacros: [Macro.Type] = [VACopyWithMacro.self]
+    let providingMacros: [Macro.Type] = [
+        VACopyWithMacro.self,
+        VAMutableCopyMacro.self,
+    ]
 }
