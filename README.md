@@ -113,7 +113,7 @@ Example 3:
 ```swift
 @CopyWith
 struct SomeStruct {
-    let id = UUID()
+    let id = "const uuidstring ;)"
     let constantProperty = false
     var boolValue = true
     var intValue = 1
