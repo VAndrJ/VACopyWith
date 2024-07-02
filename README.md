@@ -96,7 +96,7 @@ public extension SomeStruct {
     }
 }
 
-// example
+// usage
 
 let exampleStruct = SomeStruct(a: "a", b: 0)
 let exampleStructWithResetA = exampleStruct.copyWith(a: .nil)
@@ -105,6 +105,52 @@ let exampleStructWithNewA = exampleStruct.copyWith(a: .value("some string"))
 
 
 Here an auxiliary enum is added to simplify working with optional properties and clear syntax.
+
+
+Example 3:
+
+
+```swift
+@CopyWith
+struct SomeStruct {
+    let id = UUID()
+    let constantProperty = false
+    var boolValue = true
+    var intValue = 1
+    var doubleValue = 1.0
+    var stringValue = "a"
+    var customValue = MyCustomType(property: 1)
+}
+
+// expands to
+
+struct SomeStruct {
+    let id = UUID()
+    let constantProperty = false
+    var boolValue = true
+    var intValue = 1
+    var doubleValue = 1.0
+    var stringValue = "a"
+    var customValue = MyCustomType(property: 1)
+}
+
+extension SomeStruct {
+    func copyWith(boolValue: Bool? = nil, intValue: Int? = nil, doubleValue: Double? = nil, stringValue: String? = nil, customValue: MyCustomType? = nil) -> SomeStruct {
+        SomeStruct(
+            boolValue: boolValue ?? self.boolValue,
+            intValue: intValue ?? self.intValue,
+            doubleValue: doubleValue ?? self.doubleValue,
+            stringValue: stringValue ?? self.stringValue,
+            customValue: customValue ?? self.customValue
+        )
+    }
+}
+
+// usage
+
+let exampleStruct = SomeStruct()
+let exampleStructWithFalse = exampleStruct.copyWith(boolValue: false)
+```
 
 
 ## Author

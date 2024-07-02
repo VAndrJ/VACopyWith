@@ -120,6 +120,120 @@ extension VACopyWithTests {
         )
     }
 
+    func test_struct_propertes_stored_implicit() throws {
+        assertMacroExpansion(
+            #"""
+            @CopyWith
+            struct SomeStruct {
+                var optionalProperty1 = Optional(false)
+                var optionalProperty = Optional.some(1)
+                var customDictProperty = [MyCustomEnum.one: MyCustomType(field: 1)]
+                var customArrProperty = [MyCustomEnum.one]
+                var dictProperty = ["key": "value"]
+                var arrProperty = [1]
+                let ksomeProperty = 1
+                let ksomeProperty1 = true
+                let ksomeProperty2 = 1.0
+                let ksomeProperty3 = "1.0"
+                let ksomeProperty4 = """
+                1.0
+                """
+                let kcustomProperty = MyCustomEnum.one
+                let kcustomProperty1 = MyCustomType(field: 1)
+                let kcustomProperty2 = MyCustomType.init(field: 1)
+                let kcustomProperty3 = MyCustomType.parse("1")
+                var someProperty = 1
+                var someProperty1 = true
+                var someProperty2 = 1.0
+                var someProperty3 = "1.0"
+                var someProperty4 = """
+                1.0
+                """
+                var customProperty = MyCustomEnum.one
+                var customProperty1 = MyCustomType(field: 1)
+                var customProperty2 = MyCustomType.init(field: 1)
+                var customProperty3 = MyCustomType.parse("1")
+            }
+            """#,
+            expandedSource: #"""
+            struct SomeStruct {
+                var optionalProperty1 = Optional(false)
+                var optionalProperty = Optional.some(1)
+                var customDictProperty = [MyCustomEnum.one: MyCustomType(field: 1)]
+                var customArrProperty = [MyCustomEnum.one]
+                var dictProperty = ["key": "value"]
+                var arrProperty = [1]
+                let ksomeProperty = 1
+                let ksomeProperty1 = true
+                let ksomeProperty2 = 1.0
+                let ksomeProperty3 = "1.0"
+                let ksomeProperty4 = """
+                1.0
+                """
+                let kcustomProperty = MyCustomEnum.one
+                let kcustomProperty1 = MyCustomType(field: 1)
+                let kcustomProperty2 = MyCustomType.init(field: 1)
+                let kcustomProperty3 = MyCustomType.parse("1")
+                var someProperty = 1
+                var someProperty1 = true
+                var someProperty2 = 1.0
+                var someProperty3 = "1.0"
+                var someProperty4 = """
+                1.0
+                """
+                var customProperty = MyCustomEnum.one
+                var customProperty1 = MyCustomType(field: 1)
+                var customProperty2 = MyCustomType.init(field: 1)
+                var customProperty3 = MyCustomType.parse("1")
+            }
+
+            extension SomeStruct {
+                enum OR<T> {
+                    case value(T)
+                    case `nil`
+                    case ignored
+                }
+                func copyWith(optionalProperty1: OR<Bool> = .ignored, optionalProperty: OR<Int> = .ignored, customDictProperty: [MyCustomEnum: MyCustomType]? = nil, customArrProperty: [MyCustomEnum]? = nil, dictProperty: [String: String]? = nil, arrProperty: [Int]? = nil, someProperty: Int? = nil, someProperty1: Bool? = nil, someProperty2: Double? = nil, someProperty3: String? = nil, someProperty4: String? = nil, customProperty: MyCustomEnum? = nil, customProperty1: MyCustomType? = nil, customProperty2: MyCustomType? = nil, customProperty3: MyCustomType? = nil) -> SomeStruct {
+                    let optionalProperty1: Bool? = switch optionalProperty1 {
+                    case let .value(value):
+                        value
+                    case .nil:
+                        nil
+                    case .ignored:
+                        self.optionalProperty1
+                    }
+                    let optionalProperty: Int? = switch optionalProperty {
+                    case let .value(value):
+                        value
+                    case .nil:
+                        nil
+                    case .ignored:
+                        self.optionalProperty
+                    }
+                    return SomeStruct(
+                        optionalProperty1: optionalProperty1,
+                        optionalProperty: optionalProperty,
+                        customDictProperty: customDictProperty ?? self.customDictProperty,
+                        customArrProperty: customArrProperty ?? self.customArrProperty,
+                        dictProperty: dictProperty ?? self.dictProperty,
+                        arrProperty: arrProperty ?? self.arrProperty,
+                        someProperty: someProperty ?? self.someProperty,
+                        someProperty1: someProperty1 ?? self.someProperty1,
+                        someProperty2: someProperty2 ?? self.someProperty2,
+                        someProperty3: someProperty3 ?? self.someProperty3,
+                        someProperty4: someProperty4 ?? self.someProperty4,
+                        customProperty: customProperty ?? self.customProperty,
+                        customProperty1: customProperty1 ?? self.customProperty1,
+                        customProperty2: customProperty2 ?? self.customProperty2,
+                        customProperty3: customProperty3 ?? self.customProperty3
+                    )
+                }
+            }
+            """#,
+            macros: testMacros
+        )
+    }
+
     func test_struct_propertes_stored_optional() throws {
         assertMacroExpansion(
             """

@@ -26,3 +26,15 @@ assert(value1.copyWith(parameter3: .nil) == SomeStruct1(parameter1: 1, parameter
 assert(value1.copyWith(parameter3: .value("1")) == SomeStruct1(parameter1: 1, parameter2: false, parameter3: "1"))
 assert(value1.copyWith(parameter1: 10, parameter2: .nil, parameter3: .nil) == SomeStruct1(parameter1: 10, parameter2: nil, parameter3: nil))
 assert(value1.copyWith(parameter1: 10, parameter2: .value(true), parameter3: .value("3")) == SomeStruct1(parameter1: 10, parameter2: true, parameter3: "3"))
+
+@CopyWith
+struct SomeStruct2: Equatable {
+    let id = "const uuidstring ;)"
+    var parameter1 = [1]
+    var parameter2 = Optional("string")
+}
+
+let value2 = SomeStruct2()
+assert(value2.copyWith(parameter1: [2, 3, 4]) == SomeStruct2(parameter1: [2, 3, 4]))
+assert(value2.copyWith(parameter2: .value("new string")) == SomeStruct2(parameter2: "new string"))
+assert(value2.copyWith(parameter2: .nil) == SomeStruct2(parameter2: nil))
