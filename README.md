@@ -90,8 +90,8 @@ public extension SomeStruct {
             self.a
         }
         return SomeStruct(
-            someProperty: a,
-            someProperty1: b ?? self.b
+            a: a,
+            b: b ?? self.b
         )
     }
 }
