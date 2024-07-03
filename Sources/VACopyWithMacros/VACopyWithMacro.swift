@@ -100,5 +100,6 @@ struct VACopyWithPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
         VACopyWithMacro.self,
         VAMutatedCopyMacro.self,
+        VAMutatingMacro.self,
     ]
 }

@@ -51,3 +51,39 @@ assert(value3.mutatedCopy {
     $0.parameter1 = 42
     $0.parameter2 = true
 } == SomeStruct3(parameter1: 42, parameter2: true))
+
+@MutatedCopy
+public protocol SomeProtocol: Equatable {}
+
+struct SomeStruct4: SomeProtocol {
+    var parameter1: Int
+    var parameter2: Bool
+}
+
+let value4 = SomeStruct4(parameter1: 0, parameter2: false)
+assert(value4.mutatedCopy {
+    $0.parameter1 = 42
+    $0.parameter2 = true
+} == SomeStruct4(parameter1: 42, parameter2: true))
+
+@Mutating
+class SomeClass {
+    var parameter1 = 0
+}
+
+let example = SomeClass().mutating { $0.parameter1 = 42 }
+assert(example.parameter1 == 42)
+example.mutating { $0.parameter1 = 0 }
+assert(example.parameter1 == 0)
+
+@Mutating
+public protocol SomeAnyObjectProtocol: AnyObject {}
+
+class SomeClass1: SomeAnyObjectProtocol {
+    var parameter1 = 0
+}
+
+let example1 = SomeClass1().mutating { $0.parameter1 = 42 }
+assert(example1.parameter1 == 42)
+example1.mutating { $0.parameter1 = 0 }
+assert(example1.parameter1 == 0)

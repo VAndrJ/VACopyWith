@@ -10,6 +10,7 @@ import VACopyWithMacros
 let testMacros: [String: Macro.Type] = [
     "CopyWith": VACopyWithMacro.self,
     "MutatedCopy": VAMutatedCopyMacro.self,
+    "Mutating": VAMutatingMacro.self,
 ]
 #endif
 

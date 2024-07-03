@@ -19,17 +19,14 @@ public struct VAMutatedCopyMacro: ExtensionMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
-        guard let decl = declaration.as(StructDeclSyntax.self) else {
-            throw VACopyWithMacroError.notStruct
-        }
+        if let decl = declaration.as(StructDeclSyntax.self) {
+            let storedProperties = try decl.storedProperties()
+            guard storedProperties.contains(where: { $0.isVar }) else {
+                return []
+            }
 
-        let storedProperties = try decl.storedProperties()
-        guard storedProperties.contains(where: { $0.isVar }) else {
-            return []
-        }
-
-        return [
-            ExtensionDeclSyntax(modifiers: decl.modifiers.accessModifier, extendedType: type) {
+            return [
+                ExtensionDeclSyntax(modifiers: decl.modifiers.accessModifier, extendedType: type) {
                 """
                 func mutatedCopy(configuring: (_ it: inout \(type)) throws -> Void) rethrows -> \(type) {
                     var mutableCopy = self
@@ -38,7 +35,23 @@ public struct VAMutatedCopyMacro: ExtensionMacro {
                     return mutableCopy
                 }
                 """
-            },
-        ]
+                },
+            ]
+        } else if let decl = declaration.as(ProtocolDeclSyntax.self) {
+            return [
+                ExtensionDeclSyntax(modifiers: decl.modifiers.accessModifier, extendedType: type) {
+                """
+                func mutatedCopy(configuring: (_ it: inout Self) throws -> Void) rethrows -> Self {
+                    var mutableCopy = self
+                    try configuring(&mutableCopy)
+
+                    return mutableCopy
+                }
+                """
+                },
+            ]
+        }
+
+        throw VACopyWithMacroError.notStructOrProtocol
     }
 }

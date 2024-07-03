@@ -1,6 +1,6 @@
 //
-//  VACopyWithTests+MutableCopy.swift
-//  
+//  VACopyWithTests+MutatedCopy.swift
+//
 //
 //  Created by VAndrJ on 02.07.2024.
 //
@@ -43,7 +43,7 @@ extension VACopyWithTests {
                 let (a, b): (Int, Int)
             }
             """,
-            diagnostics: [DiagnosticSpec(message: VACopyWithMacroError.notStruct.description, line: 1, column: 1)],
+            diagnostics: [DiagnosticSpec(message: VACopyWithMacroError.notStructOrProtocol.description, line: 1, column: 1)],
             macros: testMacros
         )
     }
@@ -80,6 +80,28 @@ extension VACopyWithTests {
 
             extension SomeStruct {
                 func mutatedCopy(configuring: (_ it: inout SomeStruct) throws -> Void) rethrows -> SomeStruct {
+                    var mutableCopy = self
+                    try configuring(&mutableCopy)
+
+                    return mutableCopy
+                }
+            }
+            """,
+            macros: testMacros
+        )
+    }    
+
+    func test_mutated_protocol_var() throws {
+        assertMacroExpansion(
+            """
+            @MutatedCopy
+            protocol SomeProtocol {}
+            """,
+            expandedSource: """
+            protocol SomeProtocol {}
+
+            extension SomeProtocol {
+                func mutatedCopy(configuring: (_ it: inout Self) throws -> Void) rethrows -> Self {
                     var mutableCopy = self
                     try configuring(&mutableCopy)
 
