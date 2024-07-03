@@ -160,7 +160,7 @@ Example:
 
 
 ```swift
-@MutableCopy
+@MutatedCopy
 struct SomeStruct: Equatable {
     let id = "const uuidstring ;)"
     var intValue: Int
@@ -176,7 +176,7 @@ struct SomeStruct: Equatable {
 }
 
 extension SomeStruct {
-    func mutableCopy(configuring: (inout SomeStruct) throws -> Void) rethrows -> SomeStruct {
+    func mutatedCopy(configuring: (_ it: inout SomeStruct) throws -> Void) rethrows -> SomeStruct {
         var mutableCopy = self
         try configuring(&mutableCopy)
 
@@ -187,7 +187,7 @@ extension SomeStruct {
 // usage
 
 let exampleStruct = SomeStruct(parameter1: 0, parameter2: false)
-let exampleStructModified = exampleStruct.mutableCopy {
+let exampleStructModified = exampleStruct.mutatedCopy {
     $0.intValue = 42
     $0.boolValue = true
 }

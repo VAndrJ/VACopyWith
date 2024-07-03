@@ -15,10 +15,10 @@ import VACopyWithMacros
 
 extension VACopyWithTests {
 
-    func test_mutableCopy_struct_extension() throws {
+    func test_mutated_struct_extension() throws {
         assertMacroExpansion(
             """
-            @MutableCopy
+            @MutatedCopy
             struct SomeStruct {
             }
             """,
@@ -30,10 +30,10 @@ extension VACopyWithTests {
         )
     }
 
-    func test_mutableCopy_struct_failure() throws {
+    func test_mutated_struct_failure() throws {
         assertMacroExpansion(
             """
-            @MutableCopy
+            @MutatedCopy
             class SomeStruct {
                 let (a, b): (Int, Int)
             }
@@ -48,10 +48,10 @@ extension VACopyWithTests {
         )
     }
 
-    func test_mutableCopy_struct_let() throws {
+    func test_mutated_struct_let() throws {
         assertMacroExpansion(
             """
-            @MutableCopy
+            @MutatedCopy
             struct SomeStruct {
                 let a: Int
             }
@@ -65,10 +65,10 @@ extension VACopyWithTests {
         )
     }
 
-    func test_mutableCopy_struct_var() throws {
+    func test_mutated_struct_var() throws {
         assertMacroExpansion(
             """
-            @MutableCopy
+            @MutatedCopy
             struct SomeStruct {
                 var a: Int
             }
@@ -79,7 +79,7 @@ extension VACopyWithTests {
             }
 
             extension SomeStruct {
-                func mutableCopy(configuring: (inout SomeStruct) throws -> Void) rethrows -> SomeStruct {
+                func mutatedCopy(configuring: (_ it: inout SomeStruct) throws -> Void) rethrows -> SomeStruct {
                     var mutableCopy = self
                     try configuring(&mutableCopy)
 

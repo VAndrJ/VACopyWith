@@ -96,7 +96,7 @@ public struct VACopyWithMacro: ExtensionMacro {
     }
 }
 
-public struct VAMutableCopyMacro: ExtensionMacro {
+public struct VAMutatedCopyMacro: ExtensionMacro {
 
     public static func expansion(
         of node: AttributeSyntax,
@@ -117,7 +117,7 @@ public struct VAMutableCopyMacro: ExtensionMacro {
         return [
             ExtensionDeclSyntax(modifiers: decl.modifiers.accessModifier, extendedType: type) {
                 """
-                func mutableCopy(configuring: (inout \(type)) throws -> Void) rethrows -> \(type) {
+                func mutatedCopy(configuring: (_ it: inout \(type)) throws -> Void) rethrows -> \(type) {
                     var mutableCopy = self
                     try configuring(&mutableCopy)
 
@@ -133,6 +133,6 @@ public struct VAMutableCopyMacro: ExtensionMacro {
 struct VACopyWithPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
         VACopyWithMacro.self,
-        VAMutableCopyMacro.self,
+        VAMutatedCopyMacro.self,
     ]
 }
