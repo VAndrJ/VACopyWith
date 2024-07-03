@@ -10,6 +10,11 @@
 [![Platform](https://img.shields.io/badge/platform-iOS%20%7C%20watchOS%20%7C%20tvOS%20%7C%20macOS%20%7C%20macCatalyst-lightgray.svg?style=flat)](https://developer.apple.com/discover)
 
 
+* [CopyWith](#copywith)
+* [MutatedCopy](#mutatedcopy)
+* [Mutating](#mutating)
+
+
 ### @CopyWith 
 
 Adds an extension with the `copyWith` function. Works with the default initializer and has some other limitations. For example, the following syntax is not supported:
