@@ -41,7 +41,10 @@ struct SomeStruct {
 }
 
 extension SomeStruct {
-    func copyWith(a: Int? = nil, b: Bool? = nil) -> SomeStruct {
+    func copyWith(
+        a: Int? = nil, 
+        b: Bool? = nil
+    ) -> SomeStruct {
         SomeStruct(
             a: a ?? self.a,
             b: b ?? self.b
@@ -80,7 +83,10 @@ public extension SomeStruct {
         case `nil`
         case ignored
     }
-    func copyWith(a: OR<String> = .ignored, b: Int? = nil) -> SomeStruct {
+    func copyWith(
+        a: OR<String> = .ignored, 
+        b: Int? = nil
+    ) -> SomeStruct {
         let a: String? = switch a {
         case let .value(value):
             value
@@ -135,7 +141,13 @@ struct SomeStruct {
 }
 
 extension SomeStruct {
-    func copyWith(boolValue: Bool? = nil, intValue: Int? = nil, doubleValue: Double? = nil, stringValue: String? = nil, customValue: MyCustomType? = nil) -> SomeStruct {
+    func copyWith(
+        boolValue: Bool? = nil,
+        intValue: Int? = nil,
+        doubleValue: Double? = nil,
+        stringValue: String? = nil,
+        customValue: MyCustomType? = nil
+    ) -> SomeStruct {
         SomeStruct(
             boolValue: boolValue ?? self.boolValue,
             intValue: intValue ?? self.intValue,
@@ -192,6 +204,12 @@ let exampleStructModified = exampleStruct.mutatedCopy {
     $0.boolValue = true
 }
 ```
+
+
+## TBD
+
+
+- Class mutation
 
 
 ## Author

@@ -43,19 +43,19 @@ public struct VACopyWithMacro: ExtensionMacro {
                 FunctionDeclSyntax(
                     name: "copyWith",
                     signature: FunctionSignatureSyntax(
-                        parameterClause: FunctionParameterClauseSyntax {
-                            for property in properties {
-                                if property.type.isOptional {
-                                    """
-                                    \(raw: property.name): OR<\(property.type.nonOptional)> = .ignored
-                                    """
-                                } else {
-                                    """
-                                    \(raw: property.name): \(property.type.trimmed)? = nil
-                                    """
+                        parameterClause: FunctionParameterClauseSyntax(
+                            rightParen: .rightParenToken(leadingTrivia: .newline),
+                            parametersBuilder: {
+                                for property in properties {
+                                    FunctionParameterSyntax(
+                                        leadingTrivia: .newline,
+                                        firstName: TokenSyntax("\(raw: property.name)"),
+                                        type: (property.type.isOptional ? TypeSyntax("OR<\(property.type.nonOptional)>") : TypeSyntax(OptionalTypeSyntax(wrappedType: property.type.trimmed))),
+                                        defaultValue: InitializerClauseSyntax(value: property.type.isOptional ? ExprSyntax(".ignored") : ExprSyntax("nil"))
+                                    )
                                 }
                             }
-                        },
+                        ),
                         returnClause: ReturnClauseSyntax(type: type)
                     ),
                     body: CodeBlockSyntax {
@@ -95,40 +95,6 @@ public struct VACopyWithMacro: ExtensionMacro {
         ]
     }
 }
-
-public struct VAMutatedCopyMacro: ExtensionMacro {
-
-    public static func expansion(
-        of node: AttributeSyntax,
-        attachedTo declaration: some DeclGroupSyntax,
-        providingExtensionsOf type: some TypeSyntaxProtocol,
-        conformingTo protocols: [TypeSyntax],
-        in context: some MacroExpansionContext
-    ) throws -> [ExtensionDeclSyntax] {
-        guard let decl = declaration.as(StructDeclSyntax.self) else {
-            throw VACopyWithMacroError.notStruct
-        }
-
-        let storedProperties = try decl.storedProperties()
-        guard storedProperties.contains(where: { $0.isVar }) else {
-            return []
-        }
-
-        return [
-            ExtensionDeclSyntax(modifiers: decl.modifiers.accessModifier, extendedType: type) {
-                """
-                func mutatedCopy(configuring: (_ it: inout \(type)) throws -> Void) rethrows -> \(type) {
-                    var mutableCopy = self
-                    try configuring(&mutableCopy)
-
-                    return mutableCopy
-                }
-                """
-            },
-        ]
-    }
-}
-
 @main
 struct VACopyWithPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [

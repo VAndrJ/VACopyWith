@@ -108,7 +108,10 @@ extension VACopyWithTests {
             }
 
             public extension SomeStruct {
-                func copyWith(someProperty: Int? = nil, someProperty1: Bool? = nil) -> SomeStruct {
+                func copyWith(
+                    someProperty: Int? = nil,
+                    someProperty1: Bool? = nil
+                ) -> SomeStruct {
                     SomeStruct(
                         someProperty: someProperty ?? self.someProperty,
                         someProperty1: someProperty1 ?? self.someProperty1
@@ -193,7 +196,23 @@ extension VACopyWithTests {
                     case `nil`
                     case ignored
                 }
-                func copyWith(optionalProperty1: OR<Bool> = .ignored, optionalProperty: OR<Int> = .ignored, customDictProperty: [MyCustomEnum: MyCustomType]? = nil, customArrProperty: [MyCustomEnum]? = nil, dictProperty: [String: String]? = nil, arrProperty: [Int]? = nil, someProperty: Int? = nil, someProperty1: Bool? = nil, someProperty2: Double? = nil, someProperty3: String? = nil, someProperty4: String? = nil, customProperty: MyCustomEnum? = nil, customProperty1: MyCustomType? = nil, customProperty2: MyCustomType? = nil, customProperty3: MyCustomType? = nil) -> SomeStruct {
+                func copyWith(
+                    optionalProperty1: OR<Bool> = .ignored,
+                    optionalProperty: OR<Int> = .ignored,
+                    customDictProperty: [MyCustomEnum: MyCustomType]? = nil,
+                    customArrProperty: [MyCustomEnum]? = nil,
+                    dictProperty: [String: String]? = nil,
+                    arrProperty: [Int]? = nil,
+                    someProperty: Int? = nil,
+                    someProperty1: Bool? = nil,
+                    someProperty2: Double? = nil,
+                    someProperty3: String? = nil,
+                    someProperty4: String? = nil,
+                    customProperty: MyCustomEnum? = nil,
+                    customProperty1: MyCustomType? = nil,
+                    customProperty2: MyCustomType? = nil,
+                    customProperty3: MyCustomType? = nil
+                ) -> SomeStruct {
                     let optionalProperty1: Bool? = switch optionalProperty1 {
                     case let .value(value):
                         value
@@ -257,7 +276,11 @@ extension VACopyWithTests {
                     case `nil`
                     case ignored
                 }
-                func copyWith(someProperty: OR<String> = .ignored, someProperty1: Int? = nil, someProperty2: OR<Bool> = .ignored) -> SomeStruct {
+                func copyWith(
+                    someProperty: OR<String> = .ignored,
+                    someProperty1: Int? = nil,
+                    someProperty2: OR<Bool> = .ignored
+                ) -> SomeStruct {
                     let someProperty: String? = switch someProperty {
                     case let .value(value):
                         value
@@ -318,7 +341,10 @@ extension VACopyWithTests {
             }
 
             internal extension SomeStruct {
-                func copyWith(someProperty: Int? = nil, someProperty1: Bool? = nil) -> SomeStruct {
+                func copyWith(
+                    someProperty: Int? = nil,
+                    someProperty1: Bool? = nil
+                ) -> SomeStruct {
                     SomeStruct(
                         someProperty: someProperty ?? self.someProperty,
                         someProperty1: someProperty1 ?? self.someProperty1
