@@ -168,10 +168,38 @@ let exampleStructWithFalse = exampleStruct.copyWith(boolValue: false)
 ### @MutatedCopy
 
 
-Adds an extension to a `struct` with a `mutatedCopy` function if `var` fields are present, or to `protocol` without fields check.
+Adds an extension to a `struct` with a `mutatedCopy` function if `var` fields are present.
 
 
 Example 1:
+
+
+```swift
+@MutatedCopy
+struct SomeStruct: Equatable {
+    let id = "const uuidstring ;)"
+    var intValue: Int
+    var boolValue: Bool
+}
+
+// expands to
+
+struct SomeStruct: Equatable {
+    let id = "const uuidstring ;)"
+    var intValue: Int
+    var boolValue: Bool
+}
+
+extension SomeStruct {
+    func mutatedCopy(configuring: (_ it: inout SomeStruct) throws -> Void) rethrows -> SomeStruct {
+        var mutableCopy = self
+        try configuring(&mutableCopy)
+
+        return mutableCopy
+    }
+}
+
+Example 2:
 
 
 ```swift
@@ -202,6 +230,15 @@ struct SomeStruct: SomeProtocol {
     var intValue: Int
     var boolValue: Bool
 }
+
+// usage
+
+let exampleStruct = SomeStruct(parameter1: 0, parameter2: false)
+let exampleStructModified = exampleStruct.mutatedCopy {
+    $0.intValue = 42
+    $0.boolValue = true
+}
+```
 
 // usage
 
