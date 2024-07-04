@@ -7,21 +7,28 @@
 
 import SwiftSyntax
 
+private let staticKeyword: TokenKind = .keyword(.static)
+private let classKeyword: TokenKind = .keyword(.class)
+private let varKeyword: TokenKind = .keyword(.var)
+private let letKeyword: TokenKind = .keyword(.let)
+private let willSetKeyword: TokenKind = .keyword(.willSet)
+private let didSetKeyword: TokenKind = .keyword(.didSet)
+
 public extension VariableDeclSyntax {
-    var isLet: Bool { bindingSpecifier.tokenKind == .keyword(.let) }
-    var isVar: Bool { bindingSpecifier.tokenKind == .keyword(.var) }
-    var isStatic: Bool { modifiers.contains { $0.name.tokenKind == .keyword(.static) } }
-    var isClass: Bool { modifiers.contains { $0.name.tokenKind == .keyword(.class) } }
-    var isInstance: Bool { !isClass && !isStatic }
+    var isLet: Bool { bindingSpecifier.tokenKind == letKeyword }
+    var isVar: Bool { bindingSpecifier.tokenKind == varKeyword }
+    var isStatic: Bool { modifiers.contains { $0.name.tokenKind == staticKeyword } }
+    var isClass: Bool { modifiers.contains { $0.name.tokenKind == classKeyword } }
+    var isInstance: Bool { !(isClass || isStatic) }
     var isStored: Bool {
         get throws {
             guard isInstance else {
                 return false
             }
-            guard bindings.count == 1, let binding = bindings.first, binding.pattern.as(TuplePatternSyntax.self) == nil else {
+            guard bindings.count == 1, let binding = bindings.first, !binding.pattern.is(TuplePatternSyntax.self) else {
                 throw VACopyWithMacroError.multipleBindings
             }
-            guard isLet && binding.initializer == nil || isVar else {
+            guard isVar || isLet && binding.initializer == nil else {
                 return false
             }
 
@@ -29,7 +36,7 @@ public extension VariableDeclSyntax {
             case let .accessors(node):
                 for accessor in node {
                     switch accessor.accessorSpecifier.tokenKind {
-                    case .keyword(.willSet), .keyword(.didSet):
+                    case willSetKeyword, didSetKeyword:
                         continue
                     default:
                         return false
@@ -45,7 +52,8 @@ public extension VariableDeclSyntax {
         }
     }
     var nameWithType: (name: String, type: TypeSyntax)? {
-        guard let binding = bindings.first, bindings.count == 1,
+        guard bindings.count == 1,
+              let binding = bindings.first,
               let name = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text else {
             return nil
         }
@@ -68,13 +76,13 @@ public extension VariableDeclSyntax {
 
 public extension ExprSyntax {
     var literalOrExprType: TypeSyntax? {
-        if self.as(StringLiteralExprSyntax.self) != nil {
+        if self.is(StringLiteralExprSyntax.self) {
             return TypeSyntax("String")
-        } else if self.as(IntegerLiteralExprSyntax.self) != nil {
+        } else if self.is(IntegerLiteralExprSyntax.self) {
             return TypeSyntax("Int")
-        } else if self.as(BooleanLiteralExprSyntax.self) != nil {
+        } else if self.is(BooleanLiteralExprSyntax.self) {
             return TypeSyntax("Bool")
-        } else if self.as(FloatLiteralExprSyntax.self) != nil {
+        } else if self.is(FloatLiteralExprSyntax.self) {
             return TypeSyntax("Double")
         } else if let member = self.as(MemberAccessExprSyntax.self)?.base?.description {
             return TypeSyntax("\(raw: member)")
@@ -93,7 +101,7 @@ public extension ExprSyntax {
 }
 
 public extension TypeSyntax {
-    var isOptional: Bool { self.as(OptionalTypeSyntax.self) != nil }
+    var isOptional: Bool { self.is(OptionalTypeSyntax.self) }
     var nonOptional: TypeSyntax { self.as(OptionalTypeSyntax.self)?.wrappedType.trimmed ?? self.trimmed }
 }
 
@@ -116,8 +124,8 @@ public extension DeclModifierListSyntax {
             switch declModifierSyntax.name.tokenKind {
             case let .keyword(keyword):
                 switch keyword {
-                case .public, .open: DeclModifierSyntax(name: .keyword(.public))
-                case .fileprivate, .internal: declModifierSyntax
+                case .open: DeclModifierSyntax(name: .keyword(.public))
+                case .public, .fileprivate, .internal: declModifierSyntax
                 default: nil
                 }
             default: nil

@@ -12,23 +12,23 @@ public struct VACopyWithMacro: ExtensionMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
-        guard let decl = declaration.as(StructDeclSyntax.self) else {
+        guard declaration is StructDeclSyntax else {
             throw VACopyWithMacroError.notStruct
         }
         
-        let storedProperties = try decl.storedProperties()
+        let storedProperties = try declaration.storedProperties()
         let properties = storedProperties.compactMap(\.nameWithType)
         guard !properties.isEmpty else {
             return []
         }
 
-        let isContainsOptional = properties.contains { $0.type.isOptional }
-        
+        let isContainsOptional = properties.contains(where: { $0.type.isOptional })
+
         return [
-            ExtensionDeclSyntax(modifiers: decl.modifiers.accessModifier, extendedType: type) {
+            ExtensionDeclSyntax(modifiers: declaration.modifiers.accessModifier, extendedType: type) {
                 if isContainsOptional {
                     EnumDeclSyntax(
-                        modifiers: decl.modifiers.accessModifier, 
+                        modifiers: declaration.modifiers.accessModifier,
                         name: "OR",
                         genericParameterClause: GenericParameterClauseSyntax(parameters: GenericParameterListSyntax(arrayLiteral: GenericParameterSyntax(name: "T"))),
                         memberBlock: MemberBlockSyntax(members: MemberBlockItemListSyntax(itemsBuilder: {

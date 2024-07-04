@@ -19,14 +19,14 @@ public struct VAMutatedCopyMacro: ExtensionMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
-        if let decl = declaration.as(StructDeclSyntax.self) {
-            let storedProperties = try decl.storedProperties()
+        if declaration is StructDeclSyntax {
+            let storedProperties = try declaration.storedProperties()
             guard storedProperties.contains(where: { $0.isVar }) else {
                 return []
             }
 
             return [
-                ExtensionDeclSyntax(modifiers: decl.modifiers.accessModifier, extendedType: type) {
+                ExtensionDeclSyntax(modifiers: declaration.modifiers.accessModifier, extendedType: type) {
                 """
                 func mutatedCopy(configuring: (_ it: inout \(type)) throws -> Void) rethrows -> \(type) {
                     var mutableCopy = self
@@ -37,9 +37,9 @@ public struct VAMutatedCopyMacro: ExtensionMacro {
                 """
                 },
             ]
-        } else if let decl = declaration.as(ProtocolDeclSyntax.self) {
+        } else if declaration is ProtocolDeclSyntax {
             return [
-                ExtensionDeclSyntax(modifiers: decl.modifiers.accessModifier, extendedType: type) {
+                ExtensionDeclSyntax(modifiers: declaration.modifiers.accessModifier, extendedType: type) {
                 """
                 func mutatedCopy(configuring: (_ it: inout Self) throws -> Void) rethrows -> Self {
                     var mutableCopy = self
