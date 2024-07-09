@@ -25,8 +25,8 @@ public extension VariableDeclSyntax {
             guard isInstance else {
                 return false
             }
-            guard bindings.count == 1, let binding = bindings.first, !binding.pattern.is(TuplePatternSyntax.self) else {
-                throw VACopyWithMacroError.multipleBindings
+            guard let binding = bindings.first, !binding.pattern.is(TuplePatternSyntax.self) else {
+                throw VACopyWithMacroError.tupleBindings
             }
             guard isVar || isLet && binding.initializer == nil else {
                 return false
@@ -51,26 +51,32 @@ public extension VariableDeclSyntax {
             }
         }
     }
-    var nameWithType: (name: String, type: TypeSyntax)? {
-        guard bindings.count == 1,
-              let binding = bindings.first,
-              let name = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text else {
-            return nil
-        }
-        
-        if let type = binding.typeAnnotation?.type {
-            return (name, type)
-        } else if let initializer = binding.initializer?.value {
-            if let type = initializer.literalOrExprType {
-                return (name, type)
-            } else if let member = initializer.as(ArrayExprSyntax.self)?.elements.first?.expression.literalOrExprType {
-                return (name, TypeSyntax("[\(raw: member.description)]"))
-            } else if let dict = initializer.as(DictionaryExprSyntax.self)?.content.as(DictionaryElementListSyntax.self)?.first, let key = dict.key.literalOrExprType, let value = dict.value.literalOrExprType {
-                return (name, TypeSyntax("[\(raw: key.description): \(raw: value.description)]"))
+    var nameWithType: [(name: String, type: TypeSyntax)] {
+        var names: [String] = []
+        var possibleType: TypeSyntax?
+
+        for binding in bindings {
+            if let name = binding.pattern.as(IdentifierPatternSyntax.self)?.identifier.text {
+                names.append(name)
+                if let type = binding.typeAnnotation?.type {
+                    possibleType = type
+                } else if let initializer = binding.initializer?.value {
+                    if let type = initializer.literalOrExprType {
+                        possibleType = type
+                    } else if let member = initializer.as(ArrayExprSyntax.self)?.elements.first?.expression.literalOrExprType {
+                        possibleType = TypeSyntax("[\(raw: member.description)]")
+                    } else if let dict = initializer.as(DictionaryExprSyntax.self)?.content.as(DictionaryElementListSyntax.self)?.first, let key = dict.key.literalOrExprType, let value = dict.value.literalOrExprType {
+                        possibleType = TypeSyntax("[\(raw: key.description): \(raw: value.description)]")
+                    }
+                }
             }
         }
 
-        return nil
+        if let possibleType {
+            return names.map { ($0, possibleType) }
+        } else {
+            return []
+        }
     }
 }
 

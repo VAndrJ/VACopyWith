@@ -68,7 +68,7 @@ extension VACopyWithTests {
                 let (a, b): (Int, Int)
             }
             """,
-            diagnostics: [DiagnosticSpec(message: VACopyWithMacroError.multipleBindings.description, line: 1, column: 1)],
+            diagnostics: [DiagnosticSpec(message: VACopyWithMacroError.tupleBindings.description, line: 1, column: 1)],
             macros: testMacros
         )
     }
@@ -348,6 +348,37 @@ extension VACopyWithTests {
                     SomeStruct(
                         someProperty: someProperty ?? self.someProperty,
                         someProperty1: someProperty1 ?? self.someProperty1
+                    )
+                }
+            }
+            """,
+            macros: testMacros
+        )
+    }
+
+    func test_struct_propertes_stored_multiple_bindings() throws {
+        assertMacroExpansion(
+            """
+            @CopyWith
+            struct SomeStruct {
+                let a, b, c: Int
+            }
+            """,
+            expandedSource: """
+            struct SomeStruct {
+                let a, b, c: Int
+            }
+
+            extension SomeStruct {
+                func copyWith(
+                    a: Int? = nil,
+                    b: Int? = nil,
+                    c: Int? = nil
+                ) -> SomeStruct {
+                    SomeStruct(
+                        a: a ?? self.a,
+                        b: b ?? self.b,
+                        c: c ?? self.c
                     )
                 }
             }

@@ -87,3 +87,15 @@ let example1 = SomeClass1().mutating { $0.parameter1 = 42 }
 assert(example1.parameter1 == 42)
 example1.mutating { $0.parameter1 = 0 }
 assert(example1.parameter1 == 0)
+
+
+@CopyWith
+struct SomeStruct5: Equatable {
+    let a, b: Int
+    let c: Bool
+}
+
+let value5 = SomeStruct5(a: 0, b: 1, c: false)
+assert(value5.copyWith(a: 42) == SomeStruct5(a: 42, b: 1, c: false))
+assert(value5.copyWith(b: 42) == SomeStruct5(a: 0, b: 42, c: false))
+assert(value5.copyWith(c: true) == SomeStruct5(a: 0, b: 1, c: true))

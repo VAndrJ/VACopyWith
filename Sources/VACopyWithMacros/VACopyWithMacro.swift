@@ -17,7 +17,7 @@ public struct VACopyWithMacro: ExtensionMacro {
         }
         
         let storedProperties = try declaration.storedProperties()
-        let properties = storedProperties.compactMap(\.nameWithType)
+        let properties = storedProperties.flatMap(\.nameWithType)
         guard !properties.isEmpty else {
             return []
         }
@@ -71,24 +71,25 @@ public struct VACopyWithMacro: ExtensionMacro {
                                 }
                                 """
                         }
-                        """
-                        \(raw: isContainsOptional ? "return " : "")\(FunctionCallExprSyntax(
-                            calledExpression: DeclReferenceExprSyntax(baseName: .identifier(type.description)),
-                            leftParen: .leftParenToken(),
-                            arguments: LabeledExprListSyntax {
-                                for (i, property) in properties.enumerated() {
-                                    LabeledExprSyntax(
-                                        leadingTrivia: .newline,
-                                        label: .identifier(property.name),
-                                        colon: .colonToken(),
-                                        expression: property.type.isOptional ? ExprSyntax("\(raw: property.name)") : ExprSyntax("\(raw: property.name) ?? self.\(raw: property.name)"),
-                                        trailingComma: i == properties.indices.last ? nil : .commaToken()
-                                    )
-                                }
-                            },
-                            rightParen: .rightParenToken(leadingTrivia: .newline)
-                        ))
-                        """
+                        ReturnStmtSyntax(
+                            returnKeyword: .keyword(.return, presence: isContainsOptional ? .present : .missing),
+                            expression: FunctionCallExprSyntax(
+                                calledExpression: DeclReferenceExprSyntax(baseName: .identifier(type.description)),
+                                leftParen: .leftParenToken(),
+                                arguments: LabeledExprListSyntax {
+                                    for (i, property) in properties.enumerated() {
+                                        LabeledExprSyntax(
+                                            leadingTrivia: .newline,
+                                            label: .identifier(property.name),
+                                            colon: .colonToken(),
+                                            expression: property.type.isOptional ? ExprSyntax("\(raw: property.name)") : ExprSyntax("\(raw: property.name) ?? self.\(raw: property.name)"),
+                                            trailingComma: i == properties.indices.last ? nil : .commaToken()
+                                        )
+                                    }
+                                },
+                                rightParen: .rightParenToken(leadingTrivia: .newline)
+                            )
+                        )
                     }
                 )
             },

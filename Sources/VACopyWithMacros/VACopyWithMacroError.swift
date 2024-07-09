@@ -7,7 +7,7 @@
 
 public enum VACopyWithMacroError: Error, CustomStringConvertible {
     case notStruct
-    case multipleBindings
+    case tupleBindings
     case notClassOrProtocol
     case notStructOrProtocol
     case notAnyObject
@@ -18,7 +18,7 @@ public enum VACopyWithMacroError: Error, CustomStringConvertible {
         case .notStructOrProtocol: "Must be `struct` or `protocol` declaration"
         case .notAnyObject: "Must inherit `AnyOject`"
         case .notClassOrProtocol: "Must be `class` or `protocol` declaration"
-        case .multipleBindings: "Use single variable"
+        case .tupleBindings: "Use single variable"
         }
     }
 }
